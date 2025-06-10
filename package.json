@@ -25,13 +25,13 @@
     "水印插件",
     "vite"
   ],
-  "homepage": "",
+  "homepage": "https://github.com/lz6060788/",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/lz6060788/watermark"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/lz6060788/watermark/issues"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
