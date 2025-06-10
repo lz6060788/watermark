@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>水印demo</title>
+</head>
+<body>
+  <div class="container"></div>
+  <button class="btn1">水印移除</button>
+  <button class="btn2">水印重新挂载</button>
+  <div class="container2"></div>
+</body>
+
+<script type="module">
+import { Watermark } from '/src/index.ts'
+const watermark = new Watermark({ container: '.container', image: {
+  watermarkText: 'Confidential',
+  watermarkFont: '20px Arial',
+  watermarkColor: 'white',
+  watermarkCanvasWidth: 200,
+  watermarkCanvasHeight: 300,
+  watermarkOpacity: 0.5,
+  watermarkRotate: -30
+} })
+watermark.mount()
+const btn = document.querySelector('.btn1')
+btn.onclick = () => {
+  watermark.unmount()
+  alert('水印已移除')
+}
+const btn2 = document.querySelector('.btn2')
+btn2.onclick = () => {
+  watermark.mount()
+  alert('水印已挂载')
+}
+const instance = Watermark.mount({ container: '.container2' })
+</script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  padding: 64px;
+  width: 100vw;
+  height: 100vh;
+}
+.container,
+.container2 {
+  width: 100%;
+  height: 200px;
+  background-color: rgb(0, 0, 0);
+  position: relative;
+}
+.container2 {
+  background-color: white;
+}
+button {
+  margin: 32px 0;
+  padding: 10px 20px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: #0056b3;
+}
+</style>
+</html>

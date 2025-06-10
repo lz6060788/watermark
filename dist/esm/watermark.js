@@ -1,0 +1,108 @@
+const f = {
+  image: {
+    watermarkText: (/* @__PURE__ */ new Date()).toLocaleString()
+  }
+}, m = {
+  "pointer-events": "none",
+  width: "100%",
+  height: "100%",
+  top: "0px",
+  left: "0px",
+  position: "absolute",
+  "background-position": "right top",
+  "background-size": "initial",
+  "background-repeat": "initial",
+  "background-attachment": "initial",
+  "background-origin": "initial",
+  "background-clip": "initial",
+  "background-color": "transparent !important",
+  display: "block",
+  "z-index": "100000"
+};
+class u {
+  constructor(t) {
+    this.options = {}, this.options = JSON.parse(JSON.stringify(f)), this.container = null, this.watermark = null, this.watermarkObserver = null, this.containerObserver = null, this.init(t);
+  }
+  init(t = {}) {
+    this.options = this._mergeOptions(t), this.watermark && this.container && this.container.removeChild(this.watermark), this.container = t.container ? typeof t.container == "string" ? document.querySelector(t.container) || document.body : t.container : document.body, this.watermark = document.createElement("div"), this.watermark.style.cssText = this._mergedStyleText, this.watermarkObserver = this._styleObserve(), this.containerObserver = this._removeObserve();
+  }
+  mount() {
+    if (!this.container || !this.watermark) {
+      console.warn("容器元素或挂载元素不存在，挂在失败");
+      return;
+    }
+    this.container.appendChild(this.watermark);
+  }
+  static mount(t) {
+    const e = new u(t);
+    return e.mount(), e;
+  }
+  get _mergedStyle() {
+    const { style: t, image: e } = this.options;
+    if (!t && !e)
+      return m;
+    const n = e ? typeof e == "string" ? { "background-image": `url(${e})` } : this._renderImageStyle(e) : {};
+    if (!t)
+      return Object.assign({}, m, n);
+    if (typeof t == "string") {
+      const r = t == null ? void 0 : t.split(";").reduce((i, a) => {
+        const [c, l] = a.split(":").map((s) => s.trim());
+        return c && l && (i[c] = l), i;
+      }, {});
+      return Object.assign({}, m, r, n);
+    } else
+      return Object.assign({}, m, t, n);
+  }
+  get _mergedStyleText() {
+    const t = this._mergedStyle;
+    return Object.keys(t).map((e) => `${e}: ${t[e]}`).join(";");
+  }
+  _mergeOptions(t = {}) {
+    const e = (r) => r && typeof r == "object" && !Array.isArray(r), n = (r, i) => (e(r) && e(i) && Object.keys(i).forEach((a) => {
+      e(i[a]) ? (r[a] || (r[a] = i[a]), n(r[a], i[a])) : r[a] = i[a];
+    }), r);
+    return n(this.options, t);
+  }
+  _renderImageStyle(t) {
+    const { watermarkText: e, watermarkFont: n, watermarkColor: r, watermarkOpacity: i, watermarkRotate: a, watermarkCanvasHeight: c, watermarkCanvasWidth: l } = t, s = document.createElement("canvas"), o = s.getContext("2d");
+    if (o) {
+      const d = l || 200, h = c || 200;
+      s.width = d, s.height = h, o.fillStyle = r || "rgba(0, 0, 0, 0.3)", o.font = n || "16px sans-serif", o.globalAlpha = i || 0.5, o.rotate((a || -30) * Math.PI / 180), o.fillText(e, 0, h / 2);
+      const b = s.toDataURL();
+      return s.remove(), { "background-image": `url(${b})` };
+    } else
+      return s.remove(), {};
+  }
+  _styleObserve() {
+    if (!this.watermark) return null;
+    const t = this, e = new MutationObserver(function(r) {
+      e.disconnect(), r.forEach(function(i) {
+        i.type === "attributes" && i.attributeName === "style" && (t.watermark.style.cssText = t._mergedStyleText), i.attributeName === "class" && (t.watermark.className = ""), i.attributeName === "id" && (t.watermark.id = "");
+      }), e.observe(t.watermark, n);
+    }), n = {
+      attributes: !0,
+      attributeFilter: ["style", "class", "id"]
+    };
+    return e.observe(this.watermark, n), e;
+  }
+  _removeObserve() {
+    if (!this.container) return null;
+    const t = this, e = new MutationObserver(function(r) {
+      e.disconnect(), r.forEach(function(i) {
+        i.type === "childList" && !t.container.contains(t.watermark) && t.mount();
+      }), e.observe(t.container, n);
+    }), n = {
+      childList: !0,
+      // 监听子节点变化
+      subtree: !1
+    };
+    return e.observe(this.container, n), e;
+  }
+  unmount() {
+    this.watermark && this.watermark.parentNode && this.watermark.parentNode.removeChild(this.watermark), this.watermarkObserver && (this.watermarkObserver.disconnect(), this.watermarkObserver = null), this.containerObserver && (this.containerObserver.disconnect(), this.containerObserver = null), this.watermark = null;
+  }
+}
+export {
+  u as Watermark,
+  m as defaultStyle
+};
